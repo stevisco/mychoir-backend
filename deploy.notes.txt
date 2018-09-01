@@ -1,0 +1,21 @@
+
+sudo apt-get update && sudo apt-get install apache2 -y
+sudo apt-get install default-jdk
+echo '<!doctype html><html><body><h1>No Document</h1></body></html>' | sudo tee /var/www/html/index.html
+gcloud compute firewall-rules create appsrvtomcat --allow tcp:8080 --source-tags=appsrv --source-ranges=0.0.0.0/0 --description="open tomcat port"
+
+sudo vi /etc/apache2/sites-available/000-default.conf
+#added directive ====>  ErrorDocument 404 index.html 
+sudo service apache2 reload
+
+//LOCAL
+gcloud compute scp C:\Users\sviscont\PERSONAL\angular_projects\songweb\dist\songweb\*.* appsrv:/home/sviscont/
+gcloud compute scp C:\Users\sviscont\Documents\workspace-sts\mysongs-backend\target\backendapi-0.0.1-SNAPSHOT.jar appsrv:/home/sviscont/
+
+//REMOTE
+cd /opt/mysongs-backend
+killall -9 java
+sudo mv /home/sviscont/backendapi-0.0.1-SNAPSHOT.jar /opt/mysongs-backend
+sudo mv /home/sviscont/* /var/www/html
+/opt/mysongs-backend/start.sh
+
