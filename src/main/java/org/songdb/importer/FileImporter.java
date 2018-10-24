@@ -66,7 +66,7 @@ public class FileImporter {
 				for (int k=0;k<attachments.length;k++) if (name.equalsIgnoreCase(attachments[k])) found = true;
 				if (!found) {
 					//post it!
-					uploadFile(url,name);
+					uploadFile(dir,url,name);
 				}
 			}
 			
@@ -77,51 +77,62 @@ public class FileImporter {
 	private String[] getSong(String url,String id)  {
 		HttpGet p = new HttpGet(url+"/song/"+id);
 		System.out.println("GETTING: "+p.getURI());
+		String[] res = null;
+		CloseableHttpResponse response = null;
 		try {
-			CloseableHttpResponse response = httpclient.execute(p);
-			try {
-		        HttpEntity entity = response.getEntity();
-		        if (entity != null) {
-		            String retSrc = EntityUtils.toString(entity); 
-		            if (retSrc.length()==0) return new String[] {};
-		            JSONObject result = new JSONObject(retSrc); 
-		            JSONArray arr = (JSONArray) result.get("attachments");
-		            if (arr==null) return new String[] {};
-		            String[] res = new String[arr.length()];
-		            for (int i =0;i<res.length;i++) res[i]=arr.getString(i);
-		            return res;
-		        }
-		        if (response.getStatusLine().getStatusCode()!=200) {
-		        	String error="{ \"object\": \""+entity.toString()+"\", \"message\": \""+response.getStatusLine()+"\"}";
-		        	System.out.println("ERROR "+error);
-		        	return null;
-		        }
-		    } finally {
-		        response.close();
-		    }
+			response = httpclient.execute(p);
+			 
+	        HttpEntity entity = response.getEntity();
+	        if (entity != null) {
+	            String retSrc = EntityUtils.toString(entity); 
+	            if (retSrc.length()==0) return new String[] {};
+	            JSONObject result = new JSONObject(retSrc); 
+	            JSONArray arr = null;
+	            try {
+	            	arr = (JSONArray) result.get("attachments");
+	            } catch (Exception e) { }
+	            if (arr==null) return new String[] {};
+	            res = new String[arr.length()];
+	            for (int i =0;i<res.length;i++) res[i]=arr.getString(i);
+	        }
+	        else if (response.getStatusLine().getStatusCode()!=200) {
+	        	String error="{ \"object\": \""+entity.toString()+"\", \"message\": \""+response.getStatusLine()+"\"}";
+	        	System.out.println("ERROR "+error);
+	        	res = null;
+	        }
+		  
 		} catch (Exception e) {
 			e.printStackTrace();
 			String error="{ \"object\": \""+"\", \"exception\": \""+e.getMessage()+"\"}";
 			return null;
-		} 
-		return null;
+		} finally {
+	        if (response!=null)
+				try {
+					response.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	    }
+		return res;
 	}
 	
-	private int uploadFile(String url,String filename) throws IOException {
+	private int uploadFile(String dir,String url,String filename) throws IOException {
 		
 		System.out.println("Uploading file: "+filename);
-		File f = new File("./uploads/"+filename);
+		File f = new File(dir+"/"+filename);
 		HttpEntity entity = MultipartEntityBuilder
 			    .create()
 			    .addBinaryBody("upload_file", f, ContentType.create("application/octet-stream"), filename)
 			    .addTextBody("filename", filename)
 			    .build();
 
-			HttpPost httpPost = new HttpPost(url+"/songattachupload");
-			httpPost.setEntity(entity);
-			HttpResponse response = httpclient.execute(httpPost);
-			System.out.println(response.getStatusLine());
-		return response.getStatusLine().getStatusCode();
+		HttpPost httpPost = new HttpPost(url+"/songattachupload");
+		httpPost.setEntity(entity);
+		CloseableHttpResponse response = httpclient.execute(httpPost);
+		System.out.println(response.getStatusLine());
+		int code = response.getStatusLine().getStatusCode();
+		response.close();
+		return code;
 	}
 
 }

@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface SongRepository extends CrudRepository<Song, String> {
 
-	@Query("select s from Song s where lower(s.title) like %?1% order by id asc")
+	@Query("select s from Song s where lower(s.title) like %?1% or lower(s.id) like %?1%  order by id asc")
 	public Iterable<Song> findByCustomSearch(String search);
 
 	

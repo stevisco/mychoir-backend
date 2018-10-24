@@ -1,21 +1,38 @@
 
+//SETUP
+
 sudo apt-get update && sudo apt-get install apache2 -y
-sudo apt-get install default-jdk
 echo '<!doctype html><html><body><h1>No Document</h1></body></html>' | sudo tee /var/www/html/index.html
 gcloud compute firewall-rules create appsrvtomcat --allow tcp:8080 --source-tags=appsrv --source-ranges=0.0.0.0/0 --description="open tomcat port"
 
+sudo service apache2 start
 sudo vi /etc/apache2/sites-available/000-default.conf
 #added directive ====>  ErrorDocument 404 index.html 
 sudo service apache2 reload
+
+mkdir /opt/mysongs-backend
+sudo chown -R stefano_visconti:stefano_visconti /opt/mysongs-backend
+cd /opt/mysongs-backend
+sudo apt-get install default-jdk
+echo "java --add-modules java.xml.bind -jar backendapi-0.0.1-SNAPSHOT.jar & > app.out" > start.sh
+chmod a+x start.sh
 
 //LOCAL
 gcloud compute scp C:\Users\sviscont\PERSONAL\angular_projects\songweb\dist\songweb\*.* appsrv:/home/sviscont/
 gcloud compute scp C:\Users\sviscont\Documents\workspace-sts\mysongs-backend\target\backendapi-0.0.1-SNAPSHOT.jar appsrv:/home/sviscont/
 
 //REMOTE
-cd /opt/mysongs-backend
-killall -9 java
-sudo mv /home/sviscont/backendapi-0.0.1-SNAPSHOT.jar /opt/mysongs-backend
-sudo mv /home/sviscont/* /var/www/html
-/opt/mysongs-backend/start.sh
 
+cd /opt/mysongs-backend
+
+
+
+
+//load all files on bucket songapp_backup, then
+cd /home/stefano_visconti
+gsutil cp gs://songapp_backup/* .
+gsutil cp -r gs://songapp_backup/songweb .
+killall -9 java
+sudo mv /home/stefano_visconti/backendapi-0.0.1-SNAPSHOT.jar /opt/mysongs-backend
+sudo mv /home/stefano_visconti/songweb/* /var/www/html
+/opt/mysongs-backend/start.sh

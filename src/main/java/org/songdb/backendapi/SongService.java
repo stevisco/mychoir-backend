@@ -1,13 +1,19 @@
 package org.songdb.backendapi;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,20 +50,57 @@ public class SongService {
         };
         File f = new File("./attachments");
         File[] paths = f.listFiles(fileNameFilter);
-        String[] attach = new String[paths.length];
-        int i = 0;
-        for(File path:paths) {
-            attach[i] = path.getName();
-            i++;
+        Set<String> attach = null;
+        Set<String> attachLinks = null;
+        if (paths!=null) {
+	        attach = new HashSet<String>();
+	        for(File path:paths) {
+	            if (path.getName().endsWith(".url")) {
+	            	//this attachment is a file containing a URL to open. add this information as object attachmentLinks
+	            	//open the file to extract the URL
+	            	String url = extractUrlFromFile(path.getName());
+	            	if (url!=null) {
+	            		if (attachLinks==null) attachLinks = new HashSet<String>();
+	            		attachLinks.add(url);
+	            	}
+	            }
+	            else {
+	            	attach.add(path.getName());
+	            }
+	        }
         }
         if (res.isPresent()) {
         	Song s = res.get();
-        	s.setAttachments(attach);
+        	if (attach!=null) s.setAttachments(attach.toArray(new String[0]));
+        	if (attachLinks!=null) s.setAttachmentsLinks(attachLinks.toArray(new String[0]));
         	return s;
         }
         else {
         	throw new IllegalArgumentException("Not found: "+id);
         }
+	}
+
+	private String extractUrlFromFile(String name) {
+		String url = null;
+		String base = System.getProperty("user.dir");
+		Pattern p = Pattern.compile(".*URL=(.*)");
+		try {
+			LineNumberReader fr = new LineNumberReader(
+				new InputStreamReader(
+                new FileInputStream(base+"/attachments/"+name),"UTF-8"));
+			
+			String line = null;
+			while ((line=fr.readLine())!=null){
+				Matcher m = p.matcher(line);
+				if (m.matches()) {
+					url = m.group(1);
+				}
+			}
+			fr.close();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return url;
 	}
 
 	public Song addSong(Song song) {
