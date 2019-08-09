@@ -7,7 +7,7 @@ gcloud compute firewall-rules create appsrvtomcat --allow tcp:8080 --source-tags
 
 sudo service apache2 start
 sudo vi /etc/apache2/sites-available/000-default.conf
-#added directive ====>  ErrorDocument 404 index.html 
+#added directive ====>  ErrorDocument 404 /index.html 
 sudo service apache2 reload
 
 mkdir /opt/mysongs-backend
