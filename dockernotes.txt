@@ -1,0 +1,8 @@
+
+In a new Ubuntu VM downloaded from osboxes.org
+
+setxkbmap it
+sudo apt-get install docker.io
+sudo adduser stevisco                         ----- requires interactive passwd etc
+sudo usermod -a -G docker stevisco
+--- logout and login as stevisco
