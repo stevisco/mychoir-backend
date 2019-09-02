@@ -6,8 +6,13 @@ sudo apt-get install docker.io
 sudo apt-get install maven                    ---- this will also install openjdk
 sudo adduser stevisco                         ----- will do interactive passwd etc
 sudo usermod -a -G docker stevisco              ---- make sure stevisco can run docker
-sudo apt-get install nodejs
+sudo usermod -a -G sudo stevisco                ----- make sure stevisco can be a sudoers
 
+---- install components to edit ANGULARJS, including VSCODE
+sudo apt install nodejs
+sudo apt install npm
+sudo apt purge ng-common ng-latin
+sudo npm install -g @angular/cli
 
 --- logout and login as stevisco
 mkdir projects
