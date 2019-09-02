@@ -8,6 +8,8 @@ sudo adduser stevisco                         ----- will do interactive passwd e
 sudo usermod -a -G docker stevisco              ---- make sure stevisco can run docker
 sudo usermod -a -G sudo stevisco                ----- make sure stevisco can be a sudoers
 
+sudo apt install ftpd
+
 ---- install components to edit ANGULARJS, including VSCODE
 sudo apt install nodejs
 sudo apt install npm
