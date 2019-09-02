@@ -11,7 +11,10 @@ sudo usermod -a -G sudo stevisco                ----- make sure stevisco can be 
 sudo apt install ftpd
 
 ---- install components to edit ANGULARJS, including VSCODE
-sudo apt install nodejs
+# https://github.com/nodesource/distributions/blob/master/README.md
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
 sudo apt install npm
 sudo apt purge ng-common ng-latin
 sudo npm install -g @angular/cli
