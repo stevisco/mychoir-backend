@@ -13,3 +13,5 @@ mkdir projects
 git config --global user.name stevisco
 git config --global user.email "stefano.visconti@gmail.com"
 git clone https://github.com/stevisco/mychoir-backend
+cd mychoir-backend
+mvn package
