@@ -5,4 +5,9 @@ setxkbmap it
 sudo apt-get install docker.io
 sudo adduser stevisco                         ----- requires interactive passwd etc
 sudo usermod -a -G docker stevisco
+
+
 --- logout and login as stevisco
+mkdir projects
+git config --global user.name stevisco
+git config --global user.email "stefano.visconti@gmail.com"
