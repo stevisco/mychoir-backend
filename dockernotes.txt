@@ -1,13 +1,15 @@
 
-In a new Ubuntu VM downloaded from osboxes.org
-
+-- In a new Ubuntu VM downloaded from osboxes.org
+--- as osboxes.org user
 setxkbmap it
 sudo apt-get install docker.io
-sudo adduser stevisco                         ----- requires interactive passwd etc
-sudo usermod -a -G docker stevisco
+sudo apt-get install maven                    ---- this will also install openjdk
+sudo adduser stevisco                         ----- will do interactive passwd etc
+sudo usermod -a -G docker stevisco              ---- make sure stevisco can run docker
 
 
 --- logout and login as stevisco
 mkdir projects
 git config --global user.name stevisco
 git config --global user.email "stefano.visconti@gmail.com"
+git clone https://github.com/stevisco/mychoir-backend
