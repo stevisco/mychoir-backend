@@ -17,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -120,6 +121,26 @@ public class SongController {
         headers.add(HttpHeaders.CONTENT_DISPOSITION,
         		"attachment;filename=" + file.getName());
          
+	    return ResponseEntity.ok() 
+	    		.headers(headers)
+	            .contentLength(file.length())
+	            .contentType(MediaTypeFactory.getMediaType(file.getName()).orElse(MediaType.parseMediaType("image/jpg")))
+	            .body(resource);
+	}
+
+	@RequestMapping(path = "/songattach", method = RequestMethod.GET)
+	public ResponseEntity<Resource> getattach(String name) throws IOException {
+
+		logger.info("getAttach CALL "+name);
+		if (name==null) {
+			return ResponseEntity.badRequest().body(null);
+		}
+		String base = System.getProperty("user.dir");
+		File file = new File(base+"/attachments/"+name);
+		
+	    InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+	    HttpHeaders headers = new HttpHeaders();
+        
 	    return ResponseEntity.ok() 
 	    		.headers(headers)
 	            .contentLength(file.length())

@@ -246,7 +246,7 @@ Num	CG	Titolo	Musica	Testo	Raccolta	Annopub	Editore	Fonte	FonteClass	Stile	Forma
 245	CG245	Cantiamo te						     					ORD													Assemblea
 246	CG246	Con la forza del tuo amore						     					"ORD, QUA"													Assemblea
 247	CG247	Beati i misericordiosi (Inno GMG 2016)																								Coro
-248	CG248	Misericordes sicuto Pater																								Coro e Assemblea
+248	CG248	Misericordes sicut Pater																								Coro e Assemblea
 249	CG249	Mi affido a te																								Coro
 250	CG250	Signore fa di me																								Coro
 251	CG251	Benedetto sei tu Signore	Anselmi					M: Anselmi    																		Coro
@@ -322,11 +322,11 @@ Num	CG	Titolo	Musica	Testo	Raccolta	Annopub	Editore	Fonte	FonteClass	Stile	Forma
 321	ECG061	Alleluia - Le tue parole	M. Frisina		Dio ha tanto amato il mondo	2015		"M: M. Frisina , 'Dio ha tanto amato il mondo'   (2015)"		Liturgico - Polifonico		LIT	ORD													
 322	ECG062	Santo - Dio ha tanto amato il mondo	M. Frisina		Dio ha tanto amato il mondo	2015		"M: M. Frisina , 'Dio ha tanto amato il mondo'   (2015)"		Liturgico - Polifonico		LIT	OM													
 323	ECG063	Salve dolce Vergine	M. Frisina					M: M. Frisina    		Liturgico - Polifonico																
-324																										
-325																										
-326																										
-327																										
-328																										
+324	ECG064	Nostra Pasqua o Cristo Signore	F. Massimillo	A. M. Galliano	Mistero della fede	2013				Liturgico - Polifonico		LIT	PAS													
+325	ECG065	Quelli che amano te	Gen Rosso		Voce del mio canto							LIT	ORD	OFF												
+326	ECG066	Alleluia - Voce del mio canto	Gen Rosso		Voce del mio canto							LIT	OM													
+327	ECG067	Gloria a Dio	P. Dargenio		Sorgente di vita							LIT	OM													
+328	ECG068	Ave Maria - Christmas Lullaby	J. Rutter							Liturgico - Polifonico		LIT	NAT													
 329																										
 330																										
 331																										
