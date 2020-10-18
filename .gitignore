@@ -2,3 +2,7 @@
 /target
 *.mv.db
 *.log
+*.prefs
+.project
+.classpath
+.factorypath

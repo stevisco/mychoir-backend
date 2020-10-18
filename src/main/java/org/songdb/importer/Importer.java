@@ -1,10 +1,13 @@
 package org.songdb.importer;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,25 +29,54 @@ public class Importer {
 	private Map<Integer,String> fieldMap;
 	private CloseableHttpClient httpclient;
 	private int totalcount;
+	private FileWriter logfw;
 	
 	public static final void main(String[] args) {
 		
 		Importer i = new Importer();
 		String filename="./attachments/listaCanti_2018_2.txt";
+		
 		String hostname="localhost";
 		if (args.length==2) {
 			hostname=args[0];
 			filename=args[1];
 		}
 		try {
+			i.loginfo("IMPORT STARTING");
 			i.importFromTabFile("http://"+hostname+":8080",filename);
+			i.closelog();
 			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	
+	private void closelog() {
+		if (logfw!=null)
+			try {
+				logfw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+
+	private void logerr(String line) {
+		log("ERROR",line);
+	}
+	private void loginfo(String line)  {
+		log("INFO",line);
+	}
+
+	private void log (String type,String line)   {
+		System.out.println("["+type+"] "+line+"\n");
+		try {
+			if (logfw==null){
+				logfw = new FileWriter(new File("importer.log"));
+			}
+			logfw.write("["+type+"] "+line+"\n");
+		} catch (Exception e) { e.printStackTrace(); }
+	}
+
 	
 	public void importFromTabFile(String url,String filename) throws IOException{
 		
@@ -134,8 +166,8 @@ public class Importer {
 		}
 		httpclient.close();
 		fr.close();
-		System.out.println("TOTAL FOUND:" +totalcount+" - ERRORS: "+errorList.size());
-		for (Iterator<String> it=errorList.iterator();it.hasNext();) System.out.println(it.next());
+		loginfo("TOTAL FOUND:" +totalcount+" - ERRORS: "+errorList.size());
+		for (Iterator<String> it=errorList.iterator();it.hasNext();) logerr(it.next());
 	}
 	
 	private String convertTag(String input) {
@@ -165,26 +197,41 @@ public class Importer {
 	}
 
 	private void postData(String url,StringBuffer sb)  {
-		HttpPost p = new HttpPost(url+"/songs");
-		p.setHeader("Content-Type","application/json;charset=UTF-8");
-		try {
-			p.setEntity(new StringEntity(sb.toString(),"UTF-8"));
-			CloseableHttpResponse response = httpclient.execute(p);
+		int retry = 3;
+		boolean success=false;
+		String error = null;
+		while (!success && retry>0){
+			HttpPost p = new HttpPost(url+"/songs");
+			p.setHeader("Content-Type","application/json;charset=UTF-8");
 			try {
-		        HttpEntity entity = response.getEntity();
-		        System.out.println(entity.toString());
-		        if (response.getStatusLine().getStatusCode()!=200) {
-		        	String error="{ \"object\": \""+sb.toString()+"\", \"message\": \""+response.getStatusLine()+"\"}";
-		        	errorList.add(error);
-		        }
-		    } finally {
-		        response.close();
-		    }
-		} catch (Exception e) {
-			e.printStackTrace();
-			String error="{ \"object\": \""+sb.toString()+"\", \"exception\": \""+e.getMessage()+"\"}";
-        	errorList.add(error);
-		} 
+				p.setEntity(new StringEntity(sb.toString(),"UTF-8"));
+				CloseableHttpResponse response = httpclient.execute(p);
+				try {
+					HttpEntity entity = response.getEntity();
+					loginfo(entity.toString());
+					if (response.getStatusLine().getStatusCode()!=200) {
+						error="{ \"object\": \""+sb.toString()+"\", \"message\": \""+response.getStatusLine()+"\"}";	
+						logerr(error);
+						retry--;
+						loginfo("FAILURE -- RETRY counter=="+retry);
+					}
+					else {
+						success=true;
+						loginfo("SUCCESS!");
+					}
+				} finally {
+					response.close();
+				}
+			} catch (Exception e) {
+				logerr(Arrays.toString(e.getStackTrace()));
+				error="{ \"object\": \""+sb.toString()+"\", \"exception\": \""+e.getMessage()+"\"}";
+				logerr(error);
+			} 
+		}
+		if (!success && error!=null){
+			errorList.add(error);
+			logerr("FATAL FAILURE after retries for song "+sb.toString());
+		}
 	}
 	
 	private void mapField(int colno,String token) {
