@@ -18,16 +18,18 @@ echo "java --add-modules java.xml.bind -jar backendapi-0.0.1-SNAPSHOT.jar & > ap
 chmod a+x start.sh
 
 //LOCAL
-gcloud compute scp C:\Users\sviscont\PERSONAL\angular_projects\songweb\dist\songweb\*.* appsrv:/home/sviscont/
-gcloud compute scp C:\Users\sviscont\Documents\workspace-sts\mysongs-backend\target\backendapi-0.0.1-SNAPSHOT.jar appsrv:/home/sviscont/
+gcloud compute scp C:\HOME\codeprojects\mychoir\dist\*.* appsrv4:/home/stevi/
+gcloud compute scp C:\HOME\codeprojects\mychoir-backend\target\backendapi-0.0.1-SNAPSHOT.jar appsrv4:/home/stevi/
 
 //REMOTE
 
 cd /opt/mysongs-backend
+sudo mv /home/stevi/backendapi-0.0.1-SNAPSHOT.jar /opt/mysongs-backend
+sudo mv /home/stevi/mychoir/* /var/www/html
 
 
 
-
+//old
 //load all files on bucket songapp_backup, then
 cd /home/stefano_visconti
 gsutil cp gs://songapp_backup/* .
