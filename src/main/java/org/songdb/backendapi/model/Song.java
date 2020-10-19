@@ -23,7 +23,7 @@ public class Song {
 		this.yearpublished=yearpublished;
 		this.publisher=publisher;
 	}
-	public Song(String id, String title, String author, String genre,String[] tags,String ref1,String ref2,String album,String yearpublished,String publisher,String[] attachments,String[] attachmentsLinks) {
+	public Song(String id, String title, String author, String genre,String[] tags,String ref1,String ref2,String album,String yearpublished,String publisher,String[] attachments,String[] attachmentsLinks,String fulltext) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -37,6 +37,7 @@ public class Song {
 		this.publisher=publisher;
 		this.attachments = attachments;
 		this.attachmentsLinks = attachmentsLinks;
+		this.fulltext = fulltext;
 	}
 	
 	@Id
@@ -56,6 +57,7 @@ public class Song {
 	private String album;
 	private String yearpublished;
 	private String publisher;
+	private String fulltext;
 	
 	public String getAlbum() {
 		return album;
@@ -63,6 +65,14 @@ public class Song {
 
 	public void setAlbum(String album) {
 		this.album = album;
+	}
+
+	public String getFulltext() {
+		return fulltext;
+	}
+
+	public void setFulltext(String fulltext) {
+		this.fulltext = fulltext;
 	}
 
 	public String getYearpublished() {

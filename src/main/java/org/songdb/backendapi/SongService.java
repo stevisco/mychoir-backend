@@ -51,7 +51,8 @@ public class SongService {
         File f = new File("./attachments");
         File[] paths = f.listFiles(fileNameFilter);
         Set<String> attach = null;
-        Set<String> attachLinks = null;
+		Set<String> attachLinks = null;
+		StringBuffer fulltext = null;
         if (paths!=null) {
 	        attach = new HashSet<String>();
 	        for(File path:paths) {
@@ -63,7 +64,11 @@ public class SongService {
 	            		if (attachLinks==null) attachLinks = new HashSet<String>();
 	            		attachLinks.add(url);
 	            	}
-	            }
+				}
+				else if (path.getName().endsWith(".txt")){
+					//this attachment is the full text of this song, so needs to be read and added to song object
+					fulltext = extractFulltextFromFile(path.getName());
+				}
 	            else {
 	            	attach.add(path.getName());
 	            }
@@ -72,7 +77,8 @@ public class SongService {
         if (res.isPresent()) {
         	Song s = res.get();
         	if (attach!=null) s.setAttachments(attach.toArray(new String[0]));
-        	if (attachLinks!=null) s.setAttachmentsLinks(attachLinks.toArray(new String[0]));
+			if (attachLinks!=null) s.setAttachmentsLinks(attachLinks.toArray(new String[0]));
+			if (fulltext!=null) s.setFulltext(fulltext.toString());
         	return s;
         }
         else {
@@ -101,6 +107,27 @@ public class SongService {
 			logger.error(e.getMessage());
 		}
 		return url;
+	}
+
+	private StringBuffer extractFulltextFromFile(String name) {
+		StringBuffer txt = null;
+		String base = System.getProperty("user.dir");
+ 
+		try {
+			LineNumberReader fr = new LineNumberReader(
+				new InputStreamReader(
+                new FileInputStream(base+"/attachments/"+name),"UTF-8"));
+			
+			String line = null;
+			while ((line=fr.readLine())!=null){
+				if (txt==null) txt=new StringBuffer();
+				txt.append(line+"\n");
+			}
+			fr.close();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return txt;
 	}
 
 	public Song addSong(Song song) {

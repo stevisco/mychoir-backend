@@ -140,14 +140,35 @@ public class SongController {
 		
 	    InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 	    HttpHeaders headers = new HttpHeaders();
-        
+        headers.add(HttpHeaders.CONTENT_DISPOSITION,
+        		"inline;filename=" + file.getName());
 	    return ResponseEntity.ok() 
 	    		.headers(headers)
-	            .contentLength(file.length())
-	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+				.contentLength(file.length())
+	            .contentType(MediaTypeFactory.getMediaType(file.getName()).orElse(MediaType.parseMediaType("image/jpg")))
 	            .body(resource);
 	}
 	
+
+	@RequestMapping(path = "/songattachinline", method = RequestMethod.GET)
+	public ResponseEntity<Resource> getattachinline(String name) throws IOException {
+
+		logger.info("getAttachInline CALL "+name);
+		if (name==null) {
+			return ResponseEntity.badRequest().body(null);
+		}
+		String base = System.getProperty("user.dir");
+		File file = new File(base+"/attachments/"+name);
+		
+	    InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+	    HttpHeaders headers = new HttpHeaders();
+	    return ResponseEntity.ok() 
+	    		.headers(headers)
+				.contentLength(file.length())
+	            .contentType(MediaTypeFactory.getMediaType(file.getName()).orElse(MediaType.parseMediaType("image/jpg")))
+	            .body(resource);
+	}
+
 	@RequestMapping(path = "/songattachupload", method = RequestMethod.POST)
 	public String upload(@RequestParam("upload_file")MultipartFile file,@RequestParam("filename")String filename) throws IOException {
 		
