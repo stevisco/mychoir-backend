@@ -23,6 +23,7 @@ public class FileImporter {
 
 	
 	private CloseableHttpClient httpclient;
+	private String baseurl;
 	
 	public static void main(String[] args) {
 		
@@ -32,16 +33,20 @@ public class FileImporter {
 			hostname=args[0];
 			dir=args[1];
 		}
-		FileImporter i = new FileImporter();
+		FileImporter i = new FileImporter("http://"+hostname+":8080");
 		try {
-			i.uploadAll(dir,"http://"+hostname+":8080");
+			i.uploadAll(dir);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	public FileImporter(String baseurl){
+		this.baseurl = baseurl;
+	}
 
-	private void uploadAll(String dir,String url) throws IOException {
+	private void uploadAll(String dir) throws IOException {
 		httpclient = HttpClients.createDefault();		
 		File folder = new File(dir);
 		File[] list = folder.listFiles(new FileFilter() {
@@ -60,13 +65,13 @@ public class FileImporter {
 			String name = list[i].getName();
 			System.out.println("VERIFYING: "+name);
 			String id = name.substring(0,name.indexOf("_"));
-			String[] attachments = getSong(url,id);
+			String[] attachments = getSong(id);
 			boolean found = false;
 			if (attachments!=null) {
 				for (int k=0;k<attachments.length;k++) if (name.equalsIgnoreCase(attachments[k])) found = true;
 				if (!found) {
 					//post it!
-					uploadFile(dir,url,name);
+					uploadFile(dir,name);
 				}
 			}
 			
@@ -74,8 +79,8 @@ public class FileImporter {
 		httpclient.close();
 	}
 
-	private String[] getSong(String url,String id)  {
-		HttpGet p = new HttpGet(url+"/song/"+id);
+	private String[] getSong(String id)  {
+		HttpGet p = new HttpGet(baseurl+"/song/"+id);
 		System.out.println("GETTING: "+p.getURI());
 		String[] res = null;
 		CloseableHttpResponse response = null;
@@ -116,7 +121,7 @@ public class FileImporter {
 		return res;
 	}
 	
-	private int uploadFile(String dir,String url,String filename) throws IOException {
+	private int uploadFile(String dir,String filename) throws IOException {
 		
 		System.out.println("Uploading file: "+filename);
 		File f = new File(dir+"/"+filename);
@@ -126,7 +131,7 @@ public class FileImporter {
 			    .addTextBody("filename", filename)
 			    .build();
 
-		HttpPost httpPost = new HttpPost(url+"/songattachupload");
+		HttpPost httpPost = new HttpPost(baseurl+"/songattachupload");
 		httpPost.setEntity(entity);
 		CloseableHttpResponse response = httpclient.execute(httpPost);
 		System.out.println(response.getStatusLine());

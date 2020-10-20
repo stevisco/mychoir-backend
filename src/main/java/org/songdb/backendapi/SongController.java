@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.songdb.backendapi.model.Program;
 import org.songdb.backendapi.model.Song;
 import org.songdb.backendapi.model.SongListFilter;
 import org.songdb.backendapi.model.UserLogin;
@@ -35,6 +36,9 @@ public class SongController {
 
 	@Autowired
 	private SongService songService;
+
+	@Autowired
+	private ProgramService programService;
 	
 	@Autowired
 	private Environment env;
@@ -180,6 +184,23 @@ public class SongController {
 				
 	    return "Upload completed successfully";
 		
+	}
+
+
+	@RequestMapping("/programs")
+	public List<Program> programs() throws AuthException{
+		return programService.getPrograms();
+	}
+
+	@RequestMapping("/program/{id}")
+	public Program getProgram(@PathVariable String id) {
+		Program s = programService.getProgram(id);
+		return s;
+	}
+
+	@RequestMapping(method=RequestMethod.POST,value="/programs") 
+	public Program addProgram(@RequestBody Program program) {
+		return programService.addProgram(program);
 	}
 
 }

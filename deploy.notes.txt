@@ -1,5 +1,5 @@
 
-//SETUP
+//SETUP NEW MACHINE
 
 sudo apt-get update && sudo apt-get install apache2 -y
 echo '<!doctype html><html><body><h1>No Document</h1></body></html>' | sudo tee /var/www/html/index.html
@@ -17,6 +17,17 @@ sudo apt-get install default-jdk
 echo "java --add-modules java.xml.bind -jar backendapi-0.0.1-SNAPSHOT.jar & > app.out" > start.sh
 chmod a+x start.sh
 
+
+
+//building app
+
+//build backend
+mvn package 
+
+//build frontend
+ng build
+
+
 //LOCAL
 gcloud compute scp C:\HOME\codeprojects\mychoir\dist\*.* appsrv4:/home/stevi/
 gcloud compute scp C:\HOME\codeprojects\mychoir-backend\target\backendapi-0.0.1-SNAPSHOT.jar appsrv4:/home/stevi/
@@ -26,7 +37,7 @@ gcloud compute scp C:\HOME\codeprojects\mychoir-backend\target\backendapi-0.0.1-
 cd /opt/mysongs-backend
 sudo mv /home/stevi/backendapi-0.0.1-SNAPSHOT.jar /opt/mysongs-backend
 sudo mv /home/stevi/mychoir/* /var/www/html
-
+/opt/mysongs-backend/start.sh
 
 
 //old
